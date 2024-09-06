@@ -7,13 +7,17 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="book-nest" />
+        <module name="dailyaid" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="book-nest" target="20" />
+    </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
       <module name="book-nest" options="-parameters" />
+      <module name="dailyaid" options="-parameters" />
     </option>
   </component>
 </project>

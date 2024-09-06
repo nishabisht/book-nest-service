@@ -1,10 +1,12 @@
 package com.v1.book_nest.config;
 
+import com.v1.book_nest.exception.CustomAccessDeniedHandler;
 import com.v1.book_nest.service.CustomUserDetailService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -18,10 +20,14 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
-
+    @Autowired
     private final JwtRequestFilter jwtRequestFilter;
-
+    @Autowired
     private final CustomUserDetailService customUserDetailService;
+
+    @Autowired
+    private CustomAccessDeniedHandler customAccessDeniedHandler;
+
 
     @Autowired
     public SecurityConfig(JwtRequestFilter jwtRequestFilter, CustomUserDetailService customUserDetailService) {
@@ -34,10 +40,16 @@ public class SecurityConfig {
         http.csrf().disable()
                 .authorizeHttpRequests(auth-> auth
                         .requestMatchers("/h2-console/**").permitAll()
-                        .requestMatchers("/swagger-ui/**").permitAll()
-                        .requestMatchers(HttpMethod.POST,"").permitAll()
+                        .requestMatchers("/swagger-ui/**","/v3/api-docs/**").permitAll()
+                        .requestMatchers("/ops/getUserByEmail/{email}","/ops/getUser/{username}","/ops/getRoleByUsername/{username}").authenticated()
+                        .requestMatchers(HttpMethod.DELETE,"/ops/deleteUser/{username}").hasAuthority("admin")
+                        .requestMatchers(HttpMethod.PUT,"/ops/updateUser/{username}").authenticated()
+                        .requestMatchers(HttpMethod.POST,"/auth/saveUser","/auth/login").permitAll()
                         .anyRequest().authenticated()
                 )
+                .exceptionHandling()
+                .accessDeniedHandler(customAccessDeniedHandler)
+                .and()
                 .sessionManagement(session-> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .headers(headers -> headers.frameOptions().sameOrigin());
@@ -51,9 +63,8 @@ public class SecurityConfig {
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception{
         return authenticationConfiguration.getAuthenticationManager();
     }
-
     @Bean
-    public PasswordEncoder passwordEncoder(){
+    public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 }

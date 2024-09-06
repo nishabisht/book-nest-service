@@ -25,6 +25,8 @@ public class UserProfileData {
 
     private String password;
 
+    @ElementCollection(fetch = FetchType.EAGER)
+    private Set<String> roles=new HashSet<>();
 
-    private Set<Role> roles=new HashSet<>();
+
 }

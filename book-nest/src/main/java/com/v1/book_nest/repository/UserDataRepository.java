@@ -2,14 +2,16 @@ package com.v1.book_nest.repository;
 
 import com.v1.book_nest.model.UserProfileData;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
-public interface UserDataRepository extends JpaRepository<UserProfileData, Long> {
+@Repository
+public interface UserDataRepository extends JpaRepository<UserProfileData, Long>{
 
-    Optional<UserProfileData> findByUserName(String username);
+    Optional<UserProfileData> findByUsername(String username);
 
     Optional<UserProfileData> findByEmailId(String email);
-
 
 }
