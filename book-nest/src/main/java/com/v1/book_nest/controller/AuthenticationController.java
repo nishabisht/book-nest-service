@@ -20,6 +20,7 @@ import java.util.Set;
 
 @RestController
 @RequestMapping("/auth")
+@CrossOrigin(origins = "http://localhost:3000")
 public class AuthenticationController {
 
     @Autowired
@@ -39,8 +40,12 @@ public class AuthenticationController {
     //Endpoint to Save & get api
     @PostMapping("/saveUser")
     public ResponseEntity<UserProfileData> saveUser(@RequestBody UserProfileData userProfileData) throws ApplicationException {
-        UserProfileData savedUser=userAuthService.saveUser(userProfileData);
-        return ResponseEntity.status(HttpStatus.CREATED).body(savedUser);
+        try{
+            UserProfileData savedUser = userAuthService.saveUser(userProfileData);
+            return ResponseEntity.status(HttpStatus.CREATED).body(savedUser);
+        } catch (ApplicationException e){
+            throw new ApplicationException("User registration failed"+ e.getMessage());
+        }
     }
 
 
@@ -52,7 +57,9 @@ public class AuthenticationController {
           authenticationManager.authenticate(
                   new UsernamePasswordAuthenticationToken(authenticationRequest.getUsername(), authenticationRequest.getPassword())
           );
+          log.info("User authenticated : {}", authenticationRequest.getUsername());
       }catch (AuthenticationException e){
+          log.warn("Failed login attempt for user : {}", authenticationRequest.getUsername());
           return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid username or password");
       }
 

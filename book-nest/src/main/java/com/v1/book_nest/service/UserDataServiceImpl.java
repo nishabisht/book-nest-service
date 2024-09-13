@@ -26,13 +26,13 @@ public class UserDataServiceImpl implements UserDataService {
 
     @Override
     public UserProfileData getUserByEmailId(String email) throws ApplicationException {
-        UserProfileData user=userDataRepository.findByEmailId(email).orElseThrow(()-> new ApplicationException("User not found with email: {}"+email));
+        UserProfileData user=userDataRepository.findByEmailId(email).orElseThrow(()-> new ApplicationException("User not found with email: %s"+email));
         return user;
     }
 
     @Override
     public Set<String> getRolesByUsername(String userName) throws ApplicationException {
-        UserProfileData user=userDataRepository.findByUsername(userName).orElseThrow(()->new ApplicationException("User not found"+userName));
+        UserProfileData user=userDataRepository.findByUsername(userName).orElseThrow(()->new ApplicationException("User not found "+userName));
         Set<String> role=user.getRoles();
         if (role.isEmpty()){
             log.info("user don't have any role assign: {}",role);
